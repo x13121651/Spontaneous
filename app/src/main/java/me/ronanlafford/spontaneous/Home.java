@@ -54,7 +54,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-import static android.R.attr.radius;
 import static android.app.Activity.RESULT_OK;
 
 
@@ -119,9 +118,13 @@ public class Home extends Fragment implements OnMapReadyCallback, GoogleMap.OnIn
 //                    PERMISSION_ACCESS_FINE_LOCATION);
 //        }
 //
+
+        //Map
         mapView = (MapView) rootView.findViewById(R.id.mapView2);
         mapView.onCreate(savedInstanceState);
         mapView.getMapAsync(this);
+
+        //placepicker
         pickaPlace = (TextView) rootView.findViewById(R.id.pickView);
 
         pickaPlace.setOnClickListener(new View.OnClickListener() {
@@ -137,7 +140,6 @@ public class Home extends Fragment implements OnMapReadyCallback, GoogleMap.OnIn
                 }
             }
         });
-
 
         return rootView;
     }
@@ -155,7 +157,6 @@ public class Home extends Fragment implements OnMapReadyCallback, GoogleMap.OnIn
     private void GetPlaceFromPicker(Intent data)
     {
         Place placePicked = PlacePicker.getPlace(getActivity(),data);
-
         String placeNameTextView = placePicked.getName().toString();
         String placeAddressTextView = placePicked.getAddress().toString();
         String placePhoneNumberTextView = placePicked.getPhoneNumber().toString();
@@ -176,9 +177,8 @@ public class Home extends Fragment implements OnMapReadyCallback, GoogleMap.OnIn
     }
 
 
-    /**
-     * Builds a GoogleApiClient. Uses the addApi() method to request the LocationServices API.
-     */
+
+    // Builds a GoogleApiClient. Uses the addApi() method to request the LocationServices API.
     protected synchronized void buildGoogleApiClient() {
         mGoogleApiClient = new GoogleApiClient.Builder(getContext())
                 .addConnectionCallbacks(this)
@@ -191,6 +191,7 @@ public class Home extends Fragment implements OnMapReadyCallback, GoogleMap.OnIn
     }
 
 
+    //setup the map
     @Override
     public void onMapReady(final GoogleMap googleMap) {
         googleMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
@@ -209,13 +210,7 @@ public class Home extends Fragment implements OnMapReadyCallback, GoogleMap.OnIn
         }
 
 
-//        LatLng currentLocation = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
-//
-//        this.googleMap.addMarker(
-//                new MarkerOptions().position(currentLocation).title("Party Night").snippet(address + "\n" + city + "\n" + state + "\n" + postalCode + "\n" + country).icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED))
-//
-//        );
-
+        // add click map to place marker
         this.googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
@@ -224,7 +219,9 @@ public class Home extends Fragment implements OnMapReadyCallback, GoogleMap.OnIn
             }
 
         });
-        // Set a listener for info window events.
+
+
+        // Set a click listener for info window events.
         this.googleMap.setOnInfoWindowClickListener(this);
 
         this.googleMap.setInfoWindowAdapter(new GoogleMap.InfoWindowAdapter() {
@@ -236,50 +233,30 @@ public class Home extends Fragment implements OnMapReadyCallback, GoogleMap.OnIn
 
             @Override
             public View getInfoContents(Marker marker) {
-
-                Context context = getContext(); //or getActivity(), YourActivity.this, etc.
+                Context context = getContext();
 
                 // Getting view from the layout file info_window_layout
                 View v = View.inflate(context,R.layout.windowlayout,null);
 
-
-
-//                LinearLayout info = new LinearLayout(context);
-//                info.setOrientation(LinearLayout.VERTICAL);
-//
- //            TextView title = new TextView(context);
+                //the info window title
                 TextView title = (TextView) v.findViewById(R.id.tvTitle);
-
                 title.setTextColor(Color.WHITE);
-               title.setGravity(Gravity.CENTER);
-               title.setTypeface(null, Typeface.BOLD);
+                title.setGravity(Gravity.CENTER);
+                title.setTypeface(null, Typeface.BOLD);
                 title.setText(marker.getTitle());
 
-  //     TextView snippet = new TextView(context);
+                // the info window text
                 TextView snippet = (TextView) v.findViewById(R.id.tvAddress);
                 snippet.setTextColor(Color.GRAY);
                 snippet.setText(marker.getSnippet());
 
-
-//                info.addView(title);
-//                info.addView(snippet);
-
-//                return info;
                      return v;
             }
         });
 
-
-//        // mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(currentLocation,16));
-//        CameraPosition cameraPosition = new CameraPosition.Builder()
-//                .target(currentLocation)      // Sets the center of the map to Mountain View
-//                .zoom(17)                   // Sets the zoom
-//                .bearing(0)                // Sets the orientation of the camera to east
-//                .tilt(30)                   // Sets the tilt of the camera to 30 degrees
-//                .build();                   // Creates a CameraPosition from the builder
-//        this.googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
     }
 
+    // the app lifecycle methods
     @Override
     public void onStart() {
         super.onStart();
@@ -296,8 +273,6 @@ public class Home extends Fragment implements OnMapReadyCallback, GoogleMap.OnIn
 
     @Override
     public void onConnected(Bundle connectionHint) {
-        // Log.i(MainActivity.class.getSimpleName(), "Connected to Google Play Services!");
-
         if (ContextCompat.checkSelfPermission(getContext(), android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED) {
 
@@ -308,8 +283,8 @@ public class Home extends Fragment implements OnMapReadyCallback, GoogleMap.OnIn
                 longitude = mLastLocation.getLongitude();
 
                 try {
-
-                    addresses = geocoder.getFromLocation(latitude, longitude, 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
+                    // reverse geocode the lat lang of current location
+                    addresses = geocoder.getFromLocation(latitude, longitude, 1); // return only 1 location result
                     address = addresses.get(0).getAddressLine(0); // If any additional address line present than only, check with max available address lines by getMaxAddressLineIndex()
                     city = addresses.get(0).getLocality();
                     state = addresses.get(0).getAdminArea();
@@ -322,26 +297,28 @@ public class Home extends Fragment implements OnMapReadyCallback, GoogleMap.OnIn
                 }
 
                 Toast.makeText(getContext(), "location detected", Toast.LENGTH_LONG).show();
+
                 //place marker at current position
-                //mGoogleMap.clear();
                 latLng = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
                 MarkerOptions markerOptions = new MarkerOptions();
                 markerOptions.position(latLng);
                 markerOptions.title("Current Position");
-                // markerOptions.icon(BitmapDescriptorFactory.fromResource(R.drawable.launcher));
                 markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
                 markerOptions.snippet(address + "\n" + city + "\n" + state + "\n" + postalCode + "\n" + country);
                 currLocationMarker = googleMap.addMarker(markerOptions);
 
+                //zoom camera to current location
                 LatLng currentLocation = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
                 CameraPosition cameraPosition = new CameraPosition.Builder()
-                        .target(currentLocation)      // Sets the center of the map to Mountain View
+                        .target(currentLocation)      // Sets the center of the map to current location
                         .zoom(16)                   // Sets the zoom
                         .bearing(0)                // Sets the orientation of the camera to east
                         .tilt(60)                   // Sets the tilt of the camera to 60 degrees
                         .build();                   // Creates a CameraPosition from the builder
                 this.googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
 
+
+                // add some test markers to map
                 latlngs = new ArrayList<>();
                 latlngs.add(new LatLng(53.3418983,-6.4294135));
                 latlngs.add(new LatLng(53.3471163,-6.4228665));
@@ -359,8 +336,7 @@ public class Home extends Fragment implements OnMapReadyCallback, GoogleMap.OnIn
                 for (LatLng latLng : latlngs) {
                     markerOptions.position(latLng);
                     try {
-                        createGeofence(latLng, radius);
-                        addresses = geocoder.getFromLocation(latLng.latitude,latLng.longitude, 1); // Here 1 represent max location result to returned, by documents it recommended 1 to 5
+                        addresses = geocoder.getFromLocation(latLng.latitude,latLng.longitude, 1); // return only 1 location result
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
@@ -370,11 +346,10 @@ public class Home extends Fragment implements OnMapReadyCallback, GoogleMap.OnIn
                     country = addresses.get(0).getCountryName();
                     postalCode = addresses.get(0).getPostalCode();
                     knownName = addresses.get(0).getFeatureName(); // Only if available else return NULL
-                    markerOptions.title("Some Event");
+                    markerOptions.title(postalCode + " Event");
                     markerOptions.snippet(address + "\n" + city + "\n" + state + "\n" + postalCode + "\n" + country);
                     markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
                     googleMap.addMarker(markerOptions);
-
                 }
 
             } else {
@@ -383,10 +358,10 @@ public class Home extends Fragment implements OnMapReadyCallback, GoogleMap.OnIn
 
         }
 
-       // update location at 3/5 second intervals
+       // update location at intervals
         mLocationRequest = new LocationRequest();
         mLocationRequest.setInterval(180000); //180 seconds
-        mLocationRequest.setFastestInterval(3000); //30 seconds
+        mLocationRequest.setFastestInterval(30000); //30 seconds
 
         //save some battery
         mLocationRequest.setPriority(LocationRequest.PRIORITY_BALANCED_POWER_ACCURACY);
@@ -394,9 +369,8 @@ public class Home extends Fragment implements OnMapReadyCallback, GoogleMap.OnIn
        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest,this);
     }
 
+
 /////////geofencing//////////////////////////////////////////////////////////////////////////////////////////////
-
-
 
 //////// Create a Geofence
     private Geofence createGeofence(LatLng latLng, float radius ) {
@@ -433,7 +407,7 @@ public class Home extends Fragment implements OnMapReadyCallback, GoogleMap.OnIn
                 getContext(), GEOFENCE_REQ_CODE, intent, PendingIntent.FLAG_UPDATE_CURRENT );
     }
 
-    // Add the created GeofenceRequest to the device's monitoring list
+//////// Add the created GeofenceRequest to the device's monitoring list
     private void addGeofence(GeofencingRequest request) {
         Log.d(TAG, "addGeofence");
         if (checkPermission())
@@ -506,7 +480,7 @@ public class Home extends Fragment implements OnMapReadyCallback, GoogleMap.OnIn
     // Start Geofence creation process
     private void startGeofence() {
         Log.i(TAG, "startGeofence()");
-        if( xmarkerOptions != null ) {
+        if( markerOptions != null ) {
             Geofence geofence = createGeofence( markerOptions.getPosition(), GEOFENCE_RADIUS );
             GeofencingRequest geofenceRequest = createGeofenceRequest( geofence );
             addGeofence( geofenceRequest );
