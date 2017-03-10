@@ -80,11 +80,11 @@ public class Home extends Fragment implements OnMapReadyCallback, GoogleMap.OnIn
     ArrayList<LatLng> latlngs = null;
     Geocoder geocoder;
     MarkerOptions markerOptions;
-    MarkerOptions xmarkerOptions;
+
 
     private static final long GEO_DURATION = 60 * 60 * 1000;
     private static final String GEOFENCE_REQ_ID = "My Geofence";
-    private static final float GEOFENCE_RADIUS = 500.0f; // in meters
+    private static final float GEOFENCE_RADIUS = 100.0f; // in meters
 
     int PLACE_PICKER_REQUEST = 1;
     TextView pickaPlace;
@@ -109,15 +109,6 @@ public class Home extends Fragment implements OnMapReadyCallback, GoogleMap.OnIn
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.home, container, false);
-
-
-//
-//  if (ContextCompat.checkSelfPermission( getContext(), android.Manifest.permission.ACCESS_FINE_LOCATION)
-//                != PackageManager.PERMISSION_GRANTED) {
-//            ActivityCompat.requestPermissions(getActivity(), new String[] { android.Manifest.permission.ACCESS_FINE_LOCATION },
-//                    PERMISSION_ACCESS_FINE_LOCATION);
-//        }
-//
 
         //Map
         mapView = (MapView) rootView.findViewById(R.id.mapView2);
@@ -335,7 +326,16 @@ public class Home extends Fragment implements OnMapReadyCallback, GoogleMap.OnIn
 
                 for (LatLng latLng : latlngs) {
                     markerOptions.position(latLng);
+
                     try {
+                        // add circle to marker
+                        aCircle = googleMap.addCircle(new CircleOptions()
+                                .center(new LatLng(latLng.latitude, latLng.longitude))
+                                .radius(GEOFENCE_RADIUS)
+                                .strokeColor(Color.GRAY));
+                        // store the created circles
+                        allCircles.add(aCircle);
+
                         addresses = geocoder.getFromLocation(latLng.latitude,latLng.longitude, 1); // return only 1 location result
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -371,6 +371,29 @@ public class Home extends Fragment implements OnMapReadyCallback, GoogleMap.OnIn
 
 
 /////////geofencing//////////////////////////////////////////////////////////////////////////////////////////////
+    Marker aMarker;
+    Circle aCircle;
+
+    // this will hold the circles
+    List<Circle> allCircles = new ArrayList<Circle>();
+    // this will hold the markers
+    List<Marker> allMarkers = new ArrayList<Marker>();
+
+    public void createNewMarkerAndCircle() {
+        aMarker = googleMap.addMarker(new MarkerOptions()
+                .position(new LatLng(latLng.latitude, latLng.longitude))
+                .title("Marker Test")
+                .snippet("xyz")
+                .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_AZURE   )));
+        // store the new marker in the above list
+        allMarkers.add(aMarker);
+        aCircle = googleMap.addCircle(new CircleOptions()
+                        .center(new LatLng(latLng.latitude, latLng.longitude))
+                        .radius(150)
+                        .strokeColor(Color.RED));
+                // store the created circles
+                allCircles.add(aCircle);
+    }
 
 //////// Create a Geofence
     private Geofence createGeofence(LatLng latLng, float radius ) {
@@ -608,6 +631,9 @@ public class Home extends Fragment implements OnMapReadyCallback, GoogleMap.OnIn
                 .tilt(60)                   // Sets the tilt of the camera to 60 degrees
                 .build();                   // Creates a CameraPosition from the builder
         this.googleMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
+
+
+
 
         //If you only need one location, unregister the listener
         LocationServices.FusedLocationApi.removeLocationUpdates(mGoogleApiClient, this);
