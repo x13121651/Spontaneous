@@ -58,9 +58,7 @@ public class MainActivity extends AppCompatActivity {
         b.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Intent j = new Intent(MainActivity.this, MapsActivity.class);
-                j.putExtra("Long", String.valueOf(mLastLocation.getLongitude()));
-                j.putExtra("Lat", String.valueOf(mLastLocation.getLatitude()));
+                Intent j = new Intent(MainActivity.this, TabActivity.class);
                 startActivity(j);
             }
         });
