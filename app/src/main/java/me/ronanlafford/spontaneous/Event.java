@@ -1,29 +1,26 @@
 package me.ronanlafford.spontaneous;
 
-import java.sql.Time;
-import java.util.Date;
-
 /**
  * Created by 15the on 05/02/2017.
  */
 
 public class Event {
-    public String title;
-    public String venue;
-    public Date date;
-    public Time time;
-    public Float latitude;
-    public Float longitude;
-    public String description;
+    private String title;
+    private String time;
+    private String date;
+    private String address;
+    private String description;
 
-    public Event(String title, String venue, Date date, Time time, Float latitude, Float longitude, String description) {
+    public Event(String title, String time, String date, String address, String description) {
         this.title = title;
-        this.venue = venue;
         this.date = date;
         this.time = time;
-        this.latitude = latitude;
-        this.longitude = longitude;
+        this.address = address;
         this.description = description;
+    }
+
+    public Event() {
+
     }
 
     public String getTitle() {
@@ -34,44 +31,28 @@ public class Event {
         this.title = title;
     }
 
-    public String getVenue() {
-        return venue;
-    }
-
-    public void setVenue(String venue) {
-        this.venue = venue;
-    }
-
-    public Date getDate() {
-        return date;
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
-    }
-
-    public Time getTime() {
+    public String getTime() {
         return time;
     }
 
-    public void setTime(Time time) {
+    public void setTime(String time) {
         this.time = time;
     }
 
-    public Float getLatitude() {
-        return latitude;
+    public String getDate() {
+        return date;
     }
 
-    public void setLatitude(Float latitude) {
-        this.latitude = latitude;
+    public void setDate(String date) {
+        this.date = date;
     }
 
-    public Float getLongitude() {
-        return longitude;
+    public String getAddress() {
+        return address;
     }
 
-    public void setLongitude(Float longitude) {
-        this.longitude = longitude;
+    public void setAddress(String address) {
+        this.address = address;
     }
 
     public String getDescription() {

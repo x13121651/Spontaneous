@@ -12,7 +12,6 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
 import android.text.TextUtils;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingEvent;
@@ -54,11 +53,12 @@ public class GeofenceTransitionsIntentService extends IntentService {
 
         // Test that the reported transition was of interest.
         if (geofenceTransition == Geofence.GEOFENCE_TRANSITION_ENTER ||
-                geofenceTransition == Geofence.GEOFENCE_TRANSITION_EXIT) {
+                geofenceTransition == Geofence.GEOFENCE_TRANSITION_EXIT ||
+                geofenceTransition == Geofence.GEOFENCE_TRANSITION_DWELL) {
 
             // Get the geofences that were triggered. A single event can trigger multiple geofences.
             List<Geofence> triggeringGeofences = geofencingEvent.getTriggeringGeofences();
-            Log.i("List triggered:", triggeringGeofences.toString());
+           // Log.i("List triggered:", triggeringGeofences.toString());
             // Get the transition details as a String.
             String geofenceTransitionDetails = getGeofenceTransitionDetails(
                     this,
@@ -66,7 +66,7 @@ public class GeofenceTransitionsIntentService extends IntentService {
                     triggeringGeofences
             );
 
-            Toast.makeText(this, geofenceTransition, Toast.LENGTH_SHORT).show();
+          //  Toast.makeText(this,"geodetails: xxxxxxxxxxxx" +geofenceTransitionDetails, Toast.LENGTH_LONG).show();
 
             // Send notification and log the transition details.
             sendNotification(geofenceTransitionDetails);
@@ -97,10 +97,10 @@ public class GeofenceTransitionsIntentService extends IntentService {
     private String getTransitionString(int transitionType) {
         switch (transitionType) {
             case Geofence.GEOFENCE_TRANSITION_ENTER:
-                Log.d(TAG, "Preparing to send notification...: " + transitionType);
+                Log.d(TAG, "Preparing to send Entry notification...: " + transitionType);
                 return getString(R.string.geofence_transition_entered);
             case Geofence.GEOFENCE_TRANSITION_EXIT:
-                Log.d(TAG, "Preparing to send notification...: " + transitionType);
+                Log.d(TAG, "Preparing to send Exit notification...: " + transitionType);
                 return getString(R.string.geofence_transition_exited);
             default:
                 Log.d(TAG, "Preparing to send unknown notification...: " + transitionType);
@@ -110,7 +110,6 @@ public class GeofenceTransitionsIntentService extends IntentService {
 
     private void sendNotification(String notificationDetails) {
         // Create an explicit content Intent that starts the main Activity.
-
         Intent notificationIntent = new Intent(getApplicationContext(), TabActivity.class);
 
         // Construct a task stack.

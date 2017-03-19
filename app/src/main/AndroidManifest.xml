@@ -20,7 +20,7 @@
     <uses-permission android:name="android.permission.READ_PROFILE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
 
-    <service android:name=".GeofenceTransitionsIntentService" />
+
 
     <application
         android:allowBackup="true"
@@ -88,6 +88,7 @@
             android:name=".ViewEventDetailsActivity"
             android:label="@string/title_activity_view_event_details"
             android:theme="@style/AppTheme" />
+        <service android:name=".GeofenceTransitionsIntentService"/>
 
     </application>
 

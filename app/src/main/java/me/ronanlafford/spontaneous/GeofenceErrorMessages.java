@@ -10,14 +10,12 @@ import com.google.android.gms.location.GeofenceStatusCodes;
  */
 
 public class GeofenceErrorMessages {
-    /**
-     * Prevents instantiation.
-     */
-    private GeofenceErrorMessages() {}
 
-    /**
-     * Returns the error string for a geofencing error code.
-     */
+    //Prevents instantiation.
+    private GeofenceErrorMessages() {
+    }
+
+    //Returns the error string for a geofencing error code.
     public static String getErrorString(Context context, int errorCode) {
         Resources mResources = context.getResources();
         switch (errorCode) {

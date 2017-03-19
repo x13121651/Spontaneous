@@ -2,13 +2,11 @@ package me.ronanlafford.spontaneous;
 
 
 import android.app.AlertDialog;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.location.Address;
@@ -16,14 +14,13 @@ import android.location.Geocoder;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.TaskStackBuilder;
 import android.support.v4.content.ContextCompat;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -102,6 +99,8 @@ public class Home extends Fragment implements OnMapReadyCallback, GoogleMap.OnIn
 
     int PLACE_PICKER_REQUEST = 1;
     TextView pickaPlace;
+    ImageButton myLocation;
+
     private static final String TAG = Home.class.getSimpleName();
 
     @Override
@@ -146,6 +145,25 @@ public class Home extends Fragment implements OnMapReadyCallback, GoogleMap.OnIn
                 } catch (GooglePlayServicesNotAvailableException e) {
                     e.printStackTrace();
                 }
+            }
+        });
+
+        //////Get Location
+
+        myLocation = (ImageButton) rootView.findViewById(R.id.myLocationIcon);
+
+        myLocation.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //zoom camera to current location
+                LatLng currentLocation = new LatLng(mLastLocation.getLatitude(), mLastLocation.getLongitude());
+                CameraPosition cameraPosition = new CameraPosition.Builder()
+                        .target(currentLocation)      // Sets the center of the map to current location
+                        .zoom(16)                   // Sets the zoom
+                        .bearing(0)                // Sets the orientation of the camera to east
+                        .tilt(60)                   // Sets the tilt of the camera to 60 degrees
+                        .build();                   // Creates a CameraPosition from the builder
+                mMap.animateCamera(CameraUpdateFactory.newCameraPosition(cameraPosition));
             }
         });
 
@@ -203,7 +221,7 @@ public class Home extends Fragment implements OnMapReadyCallback, GoogleMap.OnIn
         // googleMap.setMapType(GoogleMap.MAP_TYPE_TERRAIN);
         mMap = googleMap;
         checkPermission();
-        mMap.setMyLocationEnabled(true); // false to disable
+        mMap.setMyLocationEnabled(false); // false to disable
         mMap.getUiSettings().setMapToolbarEnabled(true);
         mMap.getUiSettings().setZoomControlsEnabled(true);
         mMap.setOnPoiClickListener(this);
@@ -331,7 +349,7 @@ public class Home extends Fragment implements OnMapReadyCallback, GoogleMap.OnIn
                 e.printStackTrace();
             }
 
-            Toast.makeText(getContext(), " getting current location !", Toast.LENGTH_LONG).show();
+         //   Toast.makeText(getContext(), " getting current location !", Toast.LENGTH_LONG).show();
 
 
             //place marker at current position
@@ -473,7 +491,7 @@ public class Home extends Fragment implements OnMapReadyCallback, GoogleMap.OnIn
             e.printStackTrace();
         }
 
-        Toast.makeText(getContext(), "location changed - position update in progress!", Toast.LENGTH_LONG).show();
+      //  Toast.makeText(getContext(), "location changed - position update in progress!", Toast.LENGTH_LONG).show();
 
         //place marker at current position
         latLng = new LatLng(newLatitude, newLongitude);
@@ -489,9 +507,7 @@ public class Home extends Fragment implements OnMapReadyCallback, GoogleMap.OnIn
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-    /**
-     * Map for storing information about airports in the San Francisco bay area.
-     */
+   // locations to rest geofences
     public static final HashMap<String, LatLng> LOCAL_EVENTS = new HashMap<String, LatLng>();
 
     static {  // Dublin Events
@@ -505,7 +521,7 @@ public class Home extends Fragment implements OnMapReadyCallback, GoogleMap.OnIn
         LOCAL_EVENTS.put("H", new LatLng(53.3486575, -6.2436192));
         LOCAL_EVENTS.put("I", new LatLng(53.3486573, -6.2436192));
         LOCAL_EVENTS.put("J", new LatLng(53.3491757, -6.2446767));
-        LOCAL_EVENTS.put("K", new LatLng(53.3419694, -6.4234641));
+        LOCAL_EVENTS.put("K", new LatLng(53.3479700, -6.4235800));
     }
 
 
@@ -553,7 +569,7 @@ public class Home extends Fragment implements OnMapReadyCallback, GoogleMap.OnIn
                         .center(eventMarker.getPosition())
                         .radius(100) // In meters
                         .strokeWidth(5)
-                        .strokeColor(Color.BLUE);
+                        .strokeColor(Color.argb(75,255, 87, 34));
 
 
                 // Get back the mutable Circle
@@ -561,14 +577,14 @@ public class Home extends Fragment implements OnMapReadyCallback, GoogleMap.OnIn
 
                 mGeofenceList.add(new Geofence.Builder()
                         .setRequestId(entry.getKey())
-                        .setCircularRegion(entry.getValue().latitude, entry.getValue().longitude, Constants.GEOFENCE_RADIUS_IN_METERS)
+                        .setCircularRegion(eventValue.latitude, eventValue.longitude, Constants.GEOFENCE_RADIUS_IN_METERS)
                         .setExpirationDuration(Constants.GEOFENCE_EXPIRATION_IN_MILLISECONDS)
                         .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
                         .build()
 
                 );
 
-                Log.i(TAG, "Preparing to send notification...: " + mGeofenceList.toString());
+              //  Log.i(TAG, "Preparing to send notification...: " + mGeofenceList.toString());
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -585,50 +601,11 @@ public class Home extends Fragment implements OnMapReadyCallback, GoogleMap.OnIn
 
     private PendingIntent getGeofencePendingIntent() {
         Intent intent = new Intent(getContext(), GeofenceTransitionsIntentService.class);
-        Toast.makeText(getContext(),intent.toString(), Toast.LENGTH_LONG).show();
+      //  Toast.makeText(getContext(),intent.toString(), Toast.LENGTH_LONG).show();
         return PendingIntent.getService(getContext(), 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 
-    private void sendNotification(String notificationDetails) {
-        // Create an explicit content Intent that starts the main Activity.
-        Intent notificationIntent = new Intent(getContext(), TabActivity.class);
 
-        // Construct a task stack.
-        TaskStackBuilder stackBuilder = TaskStackBuilder.create(getContext());
-
-        // Add the main Activity to the task stack as the parent.
-        stackBuilder.addParentStack(TabActivity.class);
-
-        // Push the content Intent onto the stack.
-        stackBuilder.addNextIntent(notificationIntent);
-
-        // Get a PendingIntent containing the entire back stack.
-        PendingIntent notificationPendingIntent =
-                stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-
-        // Get a notification builder that's compatible with platform versions >= 4
-        NotificationCompat.Builder builder = new NotificationCompat.Builder(getContext());
-
-        // Define the notification settings.
-        builder.setSmallIcon(R.drawable.ic_location_on_deep_orange_500_24dp)
-                // In a real app, you may want to use a library like Volley
-                // to decode the Bitmap.
-                .setLargeIcon(BitmapFactory.decodeResource(getResources(),
-                        R.drawable.ic_location_on_deep_orange_500_24dp))
-                .setColor(Color.RED)
-                .setContentTitle(notificationDetails)
-                .setContentText(getString(R.string.geofence_transition_notification_text))
-                .setContentIntent(notificationPendingIntent);
-
-        // Dismiss notification once the user touches it.
-        builder.setAutoCancel(true);
-
-        // Get an instance of the Notification manager
-        NotificationManager mNotificationManager = (NotificationManager) getContext().getSystemService(Context.NOTIFICATION_SERVICE);
-
-        // Issue the notification
-        mNotificationManager.notify(0, builder.build());
-    }
 
 
 

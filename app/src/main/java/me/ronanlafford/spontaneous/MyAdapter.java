@@ -14,11 +14,11 @@ import java.util.ArrayList;
 public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
 
     //declare arraylist
-    public ArrayList<String> eventList;
+    public ArrayList<Event> eventList;
 
     //constructor
-    public MyAdapter (ArrayList<String> eventList){
-        this.eventList= eventList;
+    public MyAdapter (ArrayList<Event> eventList){
+        this.eventList = eventList;
     }
 
     //inflate the list item (listItem.xml) within the parent Viewholder
@@ -33,21 +33,36 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
         view.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-
                     Context context = view.getContext();
                     Intent i = new Intent(context, ViewEventDetailsActivity.class);
-                   context.startActivity(i);
-
+                    context.startActivity(i);
             }
         });
 
         return new ViewHolder(view);
     }
 
+    // Clean all elements of the recycler
+    public void clear() {
+        eventList.clear();
+        notifyDataSetChanged();
+    }
+
+    // Add a list of items
+    public void addAll(ArrayList<Event> eventList) {
+        eventList.addAll(eventList);
+        notifyDataSetChanged();
+    }
+
+
     //Bind the text from the list item position to the viewholder position
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-       // holder.myTextView.setText(eventList.get(position));
+        Event event1 = eventList.get(position);
+
+        holder.tvTitle.setText(event1.getTitle());
+        holder.tvLocation.setText(event1.getAddress());
+        holder.tvDate.setText(event1.getDate());
     }
 
     // get size of list
@@ -59,15 +74,18 @@ public class MyAdapter extends RecyclerView.Adapter<MyAdapter.ViewHolder> {
     //subclass of viewholder
     public static class ViewHolder extends RecyclerView.ViewHolder {
         //declare textview
-        private TextView title;
+        private TextView tvTitle;
+        private TextView tvLocation;
+        private TextView tvDate;
 
 
         public ViewHolder(View itemView) {
             super(itemView);
             //initialise the itemview with the textview in it
 
-
-
+            tvTitle = (TextView)itemView.findViewById(R.id.tvTitle);
+            tvLocation = (TextView)itemView.findViewById(R.id.tvLocation);
+            tvDate = (TextView)itemView.findViewById(R.id.tvDate);
 
         }
     }
