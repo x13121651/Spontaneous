@@ -1,7 +1,5 @@
 package me.ronanlafford.spontaneous;
 
-import android.content.Context;
-import android.content.Intent;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
@@ -12,7 +10,6 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -86,13 +83,13 @@ public class TabActivity extends AppCompatActivity {
             public void onPageSelected(int position) {
                 if (position == 0) {
                     toolbar.setTitle("Home");
-                    toolbar.setBackgroundColor(Color.parseColor("#ff5722"));
-                    tabLayout.setBackgroundColor(Color.parseColor("#ff5722"));
+                    toolbar.setBackgroundColor(Color.parseColor("#FF7300"));
+                    tabLayout.setBackgroundColor(Color.parseColor("#FF7300"));
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                         Window window = getWindow();
                         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                        window.setStatusBarColor(Color.parseColor("#E64A19"));
-                        window.setNavigationBarColor(Color.parseColor("#E64A19"));
+                        window.setStatusBarColor(Color.parseColor("#e56700"));
+                        window.setNavigationBarColor(Color.parseColor("#e56700"));
                     }
 
                 } else if (position == 1) {
@@ -108,13 +105,13 @@ public class TabActivity extends AppCompatActivity {
 
                 } else {
                     toolbar.setTitle("Create");
-                    toolbar.setBackgroundColor(Color.parseColor("#673AB7"));
-                    tabLayout.setBackgroundColor(Color.parseColor("#673AB7"));
+                    toolbar.setBackgroundColor(Color.parseColor("#005996"));
+                    tabLayout.setBackgroundColor(Color.parseColor("#005996"));
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
                         Window window = getWindow();
                         window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-                        window.setStatusBarColor(Color.parseColor("#512DA8"));
-                        window.setNavigationBarColor(Color.parseColor("#512DA8"));
+                        window.setStatusBarColor(Color.parseColor("#005087"));
+                        window.setNavigationBarColor(Color.parseColor("#005087"));
                     }
 
                 }

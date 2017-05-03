@@ -96,7 +96,7 @@
         android:id="@+id/buttonRegister"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginTop="32dp"
+        android:layout_marginTop="34dp"
         android:background="@drawable/register_button_rounded"
         android:onClick="OnLogin"
         android:text="Register"
@@ -109,6 +109,7 @@
 
     <Button
         android:id="@+id/btnLinkToLoginScreen"
+        style="@style/Widget.AppCompat.Button.Borderless"
         android:layout_width="396dp"
         android:layout_height="48dp"
         android:layout_marginBottom="8dp"

@@ -1,19 +1,14 @@
 //package me.ronanlafford.spontaneous;
 //
-//import android.app.NotificationManager;
 //import android.app.PendingIntent;
-//import android.content.Context;
 //import android.content.Intent;
 //import android.content.pm.PackageManager;
-//import android.graphics.BitmapFactory;
 //import android.graphics.Color;
 //import android.location.Location;
 //import android.os.Bundle;
 //import android.support.annotation.NonNull;
 //import android.support.annotation.Nullable;
 //import android.support.v4.app.FragmentActivity;
-//import android.support.v4.app.NotificationCompat;
-//import android.support.v4.app.TaskStackBuilder;
 //import android.support.v4.content.ContextCompat;
 //import android.util.Log;
 //import android.widget.Toast;
@@ -156,7 +151,7 @@
 //    /////Geofence status result
 //    public void onResult(Status status) {
 //        if (status.isSuccess()) {
-//            Toast.makeText(this, "Geofences Addded", Toast.LENGTH_SHORT).show();
+//
 //        } else {
 //            String errorMessage = GeofenceErrorMessages.getErrorString(this, status.getStatusCode());
 //            Log.e(LOG_TAG, errorMessage);
@@ -226,7 +221,7 @@
 //    }
 //
 //    public void populateGeofenceList() {
-//        for (Map.Entry<String, LatLng> entry : Constants.BAY_AREA_LANDMARKS.entrySet()) {
+//        for (Map.Entry<String, LatLng> entry : Home.LOCAL_EVENTS.entrySet()) {
 //            mGeofenceList.add(new Geofence.Builder()
 //                    .setRequestId(entry.getKey())
 //                    .setCircularRegion(entry.getValue().latitude, entry.getValue().longitude, Constants.GEOFENCE_RADIUS_IN_METERS)
@@ -251,47 +246,6 @@
 //
 //
 //
-//    private void test_sendNotification(String notificationDetails) {
-//        // Create an explicit content Intent that starts the main Activity.
-//        Intent notificationIntent = new Intent(getApplicationContext(), TestMapsActivity.class);
-//
-//        // Construct a task stack.
-//        TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-//
-//        // Add the main Activity to the task stack as the parent.
-//        stackBuilder.addParentStack(TestMapsActivity.class);
-//
-//        // Push the content Intent onto the stack.
-//        stackBuilder.addNextIntent(notificationIntent);
-//
-//        // Get a PendingIntent containing the entire back stack.
-//        PendingIntent notificationPendingIntent =
-//                stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
-//
-//        // Get a notification builder that's compatible with platform versions >= 4
-//        NotificationCompat.Builder builder = new NotificationCompat.Builder(this);
-//
-//        // Define the notification settings.
-//        builder.setSmallIcon(R.drawable.ic_location_on_deep_orange_500_24dp)
-//                // In a real app, you may want to use a library like Volley
-//                // to decode the Bitmap.
-//                .setLargeIcon(BitmapFactory.decodeResource(getResources(),
-//                        R.drawable.ic_map_white_24dp))
-//                .setColor(Color.RED)
-//                .setContentTitle(notificationDetails)
-//                .setContentText(getString(R.string.geofence_transition_notification_text))
-//                .setContentIntent(notificationPendingIntent);
-//
-//        // Dismiss notification once the user touches it.
-//        builder.setAutoCancel(true);
-//
-//        // Get an instance of the Notification manager
-//        NotificationManager mNotificationManager =
-//                (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-//
-//        // Issue the notification
-//        mNotificationManager.notify(0, builder.build());
-//    }
 //
 //}
 //

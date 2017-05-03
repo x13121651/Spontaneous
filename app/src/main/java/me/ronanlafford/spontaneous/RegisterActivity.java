@@ -2,8 +2,10 @@ package me.ronanlafford.spontaneous;
 
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
@@ -72,7 +74,7 @@ public class RegisterActivity extends AppCompatActivity {
 
     //registerUser method when the button is clicked
     private void registerUser() {
-
+            checkPermission();
         //get string values of variables
         final String username = editTextUsername.getText().toString().trim();
         final String password = editTextPassword.getText().toString().trim();
@@ -119,5 +121,10 @@ public class RegisterActivity extends AppCompatActivity {
         VolleySingleton.getInstance(getApplicationContext()).addToRequestQueue(stringRequest, null);
     }
 
-
+    // Check for permission to access Location
+    private boolean checkPermission() {
+        // Ask for permission if it wasn't granted yet
+        return (ContextCompat.checkSelfPermission(getApplicationContext(), android.Manifest.permission.ACCESS_FINE_LOCATION)
+                == PackageManager.PERMISSION_GRANTED);
+    }
 }

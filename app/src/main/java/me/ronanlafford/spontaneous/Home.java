@@ -63,7 +63,7 @@ import static android.app.Activity.RESULT_OK;
 
 public class Home extends Fragment implements OnMapReadyCallback, GoogleMap.OnInfoWindowClickListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, LocationListener, GoogleMap.OnPoiClickListener, ResultCallback<Status> {
 
-
+    // mapview
     private MapView mapView;
 
     private static final int PERMISSION_ACCESS_FINE_LOCATION = 1;
@@ -71,6 +71,8 @@ public class Home extends Fragment implements OnMapReadyCallback, GoogleMap.OnIn
     // for location
     protected android.location.Location mLastLocation;
     protected android.location.Location updatedLocation;
+
+    //for latitude and longitude co-ordinates
     private LatLng latLng;
     private double latitude;
     private double longitude;
@@ -85,23 +87,30 @@ public class Home extends Fragment implements OnMapReadyCallback, GoogleMap.OnIn
     private String country;
     private String postalCode;
     private String knownName;
+
+    //arrays for addresses, co-ordinates and geofences
     private List<Address> addresses = null;
     private ArrayList<LatLng> latlngs = null;
+    protected ArrayList<Geofence> mGeofenceList;
 
-    private MarkerOptions markerOptions;
 
     private final String LOG_TAG = "Ronan's Test Maps";
-    protected ArrayList<Geofence> mGeofenceList;
     private GoogleMap mMap;
     private GoogleApiClient mGoogleApiClient;
     private LocationRequest mLocationRequest;
+    private MarkerOptions markerOptions;
     private Marker currentLocationMarker;
 
+    // placepicker
     int PLACE_PICKER_REQUEST = 1;
     TextView pickaPlace;
+
+    //to center user location
     ImageButton myLocation;
 
     private static final String TAG = Home.class.getSimpleName();
+
+
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -110,9 +119,9 @@ public class Home extends Fragment implements OnMapReadyCallback, GoogleMap.OnIn
         //   PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment) getActivity().getFragmentManager().findFragmentById(R.id.autocomplete_fragment);
 
         // Empty list for storing geofences
-        mGeofenceList = new ArrayList<Geofence>();
+        mGeofenceList = new ArrayList<>();
 
-
+        // method to build api client
         buildGoogleApiClient();
 
         // setup geocoder to get address from lat long
@@ -124,7 +133,6 @@ public class Home extends Fragment implements OnMapReadyCallback, GoogleMap.OnIn
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View rootView = inflater.inflate(R.layout.home, container, false);
-
 
         //////Map
         mapView = (MapView) rootView.findViewById(R.id.mapView2);
@@ -148,8 +156,7 @@ public class Home extends Fragment implements OnMapReadyCallback, GoogleMap.OnIn
             }
         });
 
-        //////Get Location
-
+        ////// Re-center user Location
         myLocation = (ImageButton) rootView.findViewById(R.id.myLocationIcon);
 
         myLocation.setOnClickListener(new View.OnClickListener() {
@@ -180,15 +187,22 @@ public class Home extends Fragment implements OnMapReadyCallback, GoogleMap.OnIn
         }
     }
 
-    /////Placepicker get name
+    /////Placepicker get name and number and display it in a dialog box
     private void GetPlaceFromPicker(Intent data) {
         Place placePicked = PlacePicker.getPlace(getActivity(), data);
         String placeNameTextView = placePicked.getName().toString();
-        String placeAddressTextView = placePicked.getAddress().toString();
+        String placeAddressTextView = String.valueOf(placePicked.getAddress());
         String placePhoneNumberTextView = placePicked.getPhoneNumber().toString();
+        String placePriceTextView = String.valueOf(placePicked.getPriceLevel());
+        String placeRatingTextView = String.valueOf(placePicked.getRating());
+        String placeURLTextView = placePicked.getWebsiteUri().toString();
 
-        String toastMsg = "\n\n" + placeAddressTextView
-                + "\n\n" + placePhoneNumberTextView;
+        String toastMsg =
+                  "\n" + "Address: " + placeAddressTextView
+                + "\n\n" + "Phone: " + placePhoneNumberTextView
+                + "\n\n" + "Price Level: " + placePriceTextView
+                + "\n\n" + "Rating: " + placeRatingTextView
+                + "\n\n" + "URL: " + placeURLTextView;
 
         AlertDialog alertDialog = new AlertDialog.Builder(getContext()).create();
         alertDialog.setTitle(placeNameTextView);
@@ -280,18 +294,18 @@ public class Home extends Fragment implements OnMapReadyCallback, GoogleMap.OnIn
     // the app lifecycle methods
     @Override
     public void onStart() {
-        super.onStart();
         if (!mGoogleApiClient.isConnecting() || !mGoogleApiClient.isConnected()) {
             mGoogleApiClient.connect();
         }
+        super.onStart();
     }
 
     @Override
     public void onStop() {
-        super.onStop();
         if (mGoogleApiClient.isConnected()) {
             mGoogleApiClient.disconnect();
         }
+        super.onStop();
     }
 
 
@@ -299,6 +313,8 @@ public class Home extends Fragment implements OnMapReadyCallback, GoogleMap.OnIn
     public void onConnected(Bundle connectionHint) {
         //check permission to access fine location
         checkPermission();
+
+
         // make the location request
         mLocationRequest = LocationRequest.create();
         //set the power
@@ -308,7 +324,11 @@ public class Home extends Fragment implements OnMapReadyCallback, GoogleMap.OnIn
         mLocationRequest.setInterval(180000); //180 seconds
         mLocationRequest.setFastestInterval(30000); //30 seconds
        // mLocationRequest.setSmallestDisplacement(0.1F); //1/10 meter
+
+
+        // start requesting location updates
         LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, mLocationRequest, this);
+
 
         //if connected then try add the geofences
         if (!mGoogleApiClient.isConnected()) {
@@ -328,7 +348,7 @@ public class Home extends Fragment implements OnMapReadyCallback, GoogleMap.OnIn
             // Catch exception generated if the app does not use ACCESS_FINE_LOCATION permission.
         }
 
-
+        // get last known location of user
         mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
 
         if (mLastLocation != null) {
@@ -384,16 +404,18 @@ public class Home extends Fragment implements OnMapReadyCallback, GoogleMap.OnIn
     /////Geofence status result
     public void onResult(@NonNull Status status) {
         if (status.isSuccess()) {
-            Toast.makeText(getContext(), "Geofences Added", Toast.LENGTH_SHORT).show();
+          //  Toast.makeText(getContext(), "Geofences Added", Toast.LENGTH_SHORT).show();
         } else {
             String errorMessage = GeofenceErrorMessages.getErrorString(getContext(), status.getStatusCode());
             Log.e(LOG_TAG, errorMessage);
         }
     }
 
-    private Marker geoFenceMarker;
 
     // Create a marker for the geofence creation
+    private Marker geoFenceMarker;
+
+    ////////////////////////////////////////////////////////////this is not really needed
     private void markerForGeofence(LatLng latLng) {
         Log.i(TAG, "Where map was touched:(" + latLng + ")");
         // Define marker options
@@ -414,7 +436,7 @@ public class Home extends Fragment implements OnMapReadyCallback, GoogleMap.OnIn
     // Check for permission to access Location
     private boolean checkPermission() {
         Log.d(LOG_TAG, "checkPermission()");
-        // Ask for permission if it wasn't granted yet
+        // Ask for permission for location access if it wasn't granted yet
         return (ContextCompat.checkSelfPermission(getContext(), android.Manifest.permission.ACCESS_FINE_LOCATION)
                 == PackageManager.PERMISSION_GRANTED);
     }
@@ -426,8 +448,7 @@ public class Home extends Fragment implements OnMapReadyCallback, GoogleMap.OnIn
 
     @Override
     public void onConnectionSuspended(int cause) {
-        // The connection to Google Play services was lost for some reason. We call connect() to
-        // attempt to re-establish the connection.
+        // call connect() to attempt to re-establish the connection.
         Toast.makeText(getContext(), "Connection Suspended....", Toast.LENGTH_LONG).show();
         mGoogleApiClient.connect();
     }
@@ -472,10 +493,11 @@ public class Home extends Fragment implements OnMapReadyCallback, GoogleMap.OnIn
             currentLocationMarker.remove();
         }
 
-        updatedLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+       // updatedLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
+        mLastLocation = LocationServices.FusedLocationApi.getLastLocation(mGoogleApiClient);
         checkPermission();
-        newLatitude = updatedLocation.getLatitude();
-        newLongitude = updatedLocation.getLongitude();
+        newLatitude = mLastLocation.getLatitude();
+        newLongitude = mLastLocation.getLongitude();
 
         try {
             // reverse geocode the lat lang of current location
@@ -500,7 +522,7 @@ public class Home extends Fragment implements OnMapReadyCallback, GoogleMap.OnIn
         MarkerOptions markerOptions = new MarkerOptions();
         markerOptions.position(latLng);
         markerOptions.title("updated Position");
-        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN));
+        markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
         markerOptions.snippet(address + "\n" + city + "\n" + state + "\n" + postalCode + "\n" + country);
         currentLocationMarker = mMap.addMarker(markerOptions);
 
@@ -528,12 +550,12 @@ public class Home extends Fragment implements OnMapReadyCallback, GoogleMap.OnIn
     // Point of interest click
     @Override
     public void onPoiClick(PointOfInterest pointOfInterest) {
-        Toast.makeText(getContext(), "Clicked: " +
-                        pointOfInterest.name + "\nPlace ID:" + pointOfInterest.placeId +
-                        "\nLatitude:" + pointOfInterest.latLng.latitude +
-                        "\nLongitude:" + pointOfInterest.latLng.longitude +
-                        "\nAddress:" + pointOfInterest.toString(),
-                Toast.LENGTH_SHORT).show();
+        Toast.makeText(getContext(),
+                pointOfInterest.name
+                + "\nPlace ID:" + pointOfInterest.placeId
+                + "\nLatitude:" + pointOfInterest.latLng.latitude
+                + "\nLongitude:" + pointOfInterest.latLng.longitude,
+                Toast.LENGTH_LONG).show();
     }
 
     //to loop through the list of locations and add to geofence list
@@ -560,7 +582,7 @@ public class Home extends Fragment implements OnMapReadyCallback, GoogleMap.OnIn
               //  Toast.makeText(getContext(), "eventmarker added", Toast.LENGTH_SHORT).show();
                 eventMarker.title("test");
                 eventMarker.snippet(address + "\n" + city + "\n" + state + "\n" + postalCode + "\n" + country);
-                eventMarker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_ORANGE));
+                eventMarker.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_VIOLET));
                 mMap.addMarker(eventMarker);
 
 
