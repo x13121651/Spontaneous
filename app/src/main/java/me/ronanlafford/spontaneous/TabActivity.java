@@ -1,8 +1,11 @@
 package me.ronanlafford.spontaneous;
 
+import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
@@ -17,6 +20,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 
@@ -37,6 +41,8 @@ public class TabActivity extends AppCompatActivity {
      */
     private ViewPager mViewPager;
 
+    ImageButton talkback;
+    SharedPreferences tabsettings;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,6 +51,26 @@ public class TabActivity extends AppCompatActivity {
 
         final Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
+
+        //get username from intent
+
+      //  tabsettings = getSharedPreferences("Preferences", 0);
+       // final String prefName = tabsettings.getString("username", "");
+
+      // final String name = getIntent().getExtras().getString("username");
+       // final String name = tabsettings.getString("username", "");
+        //toolbar.setTitle("Logged in: "+ name);
+
+        //toolbar icon to open the accessibility screen
+        toolbar.setNavigationIcon(R.drawable.ic_record_voice_over_white_24dp);
+        //toolbar button to open the accessibility screen
+        toolbar.setNavigationOnClickListener(new View.OnClickListener(){
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(Settings.ACTION_ACCESSIBILITY_SETTINGS);
+                startActivity(intent);
+            }
+        });
 
 
         // Create the adapter that will return a fragment for each of the three
@@ -61,13 +87,11 @@ public class TabActivity extends AppCompatActivity {
         tabLayout.setupWithViewPager(mViewPager);
 
 
-        tabLayout.getTabAt(0).setIcon(R.drawable.ic_map_white_24dp );
+        tabLayout.getTabAt(0).setIcon(R.drawable.ic_map_white_24dp);
 
         tabLayout.getTabAt(1).setIcon(R.drawable.ic_event_white_24dp);
 
         tabLayout.getTabAt(2).setIcon(R.drawable.ic_add_location_white_24dp);
-
-
 
 
         // when the tab changes on the tab activity.
@@ -78,11 +102,10 @@ public class TabActivity extends AppCompatActivity {
 
             }
 
-
             @Override
             public void onPageSelected(int position) {
                 if (position == 0) {
-                    toolbar.setTitle("Home");
+                    toolbar.setTitle("EventMap");
                     toolbar.setBackgroundColor(Color.parseColor("#FF7300"));
                     tabLayout.setBackgroundColor(Color.parseColor("#FF7300"));
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -104,7 +127,7 @@ public class TabActivity extends AppCompatActivity {
                     }
 
                 } else {
-                    toolbar.setTitle("Create");
+                    toolbar.setTitle("Create Event");
                     toolbar.setBackgroundColor(Color.parseColor("#005996"));
                     tabLayout.setBackgroundColor(Color.parseColor("#005996"));
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
@@ -156,7 +179,6 @@ public class TabActivity extends AppCompatActivity {
 
         return super.onOptionsItemSelected(item);
     }
-
 
 
     /**
@@ -239,6 +261,19 @@ public class TabActivity extends AppCompatActivity {
             return null;
         }
 
+
+    }
+
+    public void onBackPressed() {
+        //  super.onBackPressed();
+        Intent i = new Intent(getApplicationContext(),NavActivity.class);
+        startActivity(i);
+
+    }
+
+    @Override
+    protected void onPostResume() {
+        super.onPostResume();
 
     }
 }

@@ -2,12 +2,8 @@ package me.ronanlafford.spontaneous;
 
 import android.content.Context;
 import android.content.res.Resources;
-
 import com.google.android.gms.location.GeofenceStatusCodes;
 
-/**
- * Created by 15the on 11/03/2017.
- */
 
 public class GeofenceErrorMessages {
 

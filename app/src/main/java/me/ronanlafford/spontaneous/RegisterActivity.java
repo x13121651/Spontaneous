@@ -10,7 +10,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -36,9 +35,6 @@ public class RegisterActivity extends AppCompatActivity {
     private EditText editTextEmail;
     private EditText editTextPassword;
 
-    private Button buttonRegister;
-    private Button buttonToLogin;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,17 +46,17 @@ public class RegisterActivity extends AppCompatActivity {
         editTextPassword = (EditText) findViewById(R.id.regPassword);
         editTextEmail = (EditText) findViewById(R.id.regEmail);
 
-        buttonRegister = (Button) findViewById(R.id.buttonRegister);
-        buttonToLogin = (Button) findViewById(R.id.btnLinkToLoginScreen);
+        Button buttonRegister = (Button) findViewById(R.id.buttonRegister);
+        Button buttonToLogin = (Button) findViewById(R.id.btnLinkToLoginScreen);
 
-        // add click to button
+        // add click to button register
         buttonRegister.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 registerUser();
             }
         });
-        // add click to button
+        // add click to button link to login
         buttonToLogin.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -74,7 +70,7 @@ public class RegisterActivity extends AppCompatActivity {
 
     //registerUser method when the button is clicked
     private void registerUser() {
-            checkPermission();
+        checkPermission();
         //get string values of variables
         final String username = editTextUsername.getText().toString().trim();
         final String password = editTextPassword.getText().toString().trim();
@@ -86,12 +82,14 @@ public class RegisterActivity extends AppCompatActivity {
                     @Override
                     public void onResponse(String response) {
                         // set action button color
-                        Snackbar.make(findViewById(R.id.registerRoot), response.toString(), Snackbar.LENGTH_LONG)
+                        Snackbar.make(findViewById(R.id.registerRoot), response, Snackbar.LENGTH_LONG)
                                 .setDuration(3000).show();
 
                         editTextUsername.setText("");
                         editTextPassword.setText("");
                         editTextEmail.setText("");
+                        Intent i = new Intent(RegisterActivity.this, NavActivity.class);
+                        startActivity(i);
                     }
                 },
                 new Response.ErrorListener() {
@@ -114,11 +112,13 @@ public class RegisterActivity extends AppCompatActivity {
 
         };
 
-        // Create request queue and add the stringRequest to it
-        // RequestQueue requestQueue = Volley.newRequestQueue(this);
-        // requestQueue.add(stringRequest);
-
         VolleySingleton.getInstance(getApplicationContext()).addToRequestQueue(stringRequest, null);
+    }
+
+    public void onBackPressed() {
+        //  super.onBackPressed();
+        moveTaskToBack(true);
+
     }
 
     // Check for permission to access Location

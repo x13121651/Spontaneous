@@ -1,6 +1,7 @@
 package me.ronanlafford.spontaneous;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
@@ -13,10 +14,15 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.TextView;
 
 public class NavActivity extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener{
+        implements NavigationView.OnNavigationItemSelectedListener {
 
+    TextView loginView;
+    TextView profileName;
+    SharedPreferences settings;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -32,7 +38,25 @@ public class NavActivity extends AppCompatActivity
 
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
+        View header = navigationView.getHeaderView(0);
+
+        profileName = (TextView)header.findViewById(R.id.profileName);
+        settings = getSharedPreferences("Preferences", 0);
+        final String prefName = settings.getString("username", "");
+        profileName.setText(prefName);
+
+        loginView = (TextView) findViewById(R.id.loginView);
+        loginView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+                drawer.openDrawer(GravityCompat.START);
+
+            }
+        });
+
     }
+
 
     @Override
     public void onBackPressed() {
@@ -73,7 +97,7 @@ public class NavActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.nav_list) {
-            Intent i = new Intent(this, TabActivity.class);
+            Intent i = new Intent(this, RatingListActivity.class);
             startActivity(i);
         } else if (id == R.id.nav_login) {
             checkPermission();
@@ -84,9 +108,15 @@ public class NavActivity extends AppCompatActivity
             Intent i = new Intent(this, RegisterActivity.class);
             startActivity(i);
         } else if (id == R.id.nav_gallery) {
-
+            Intent i = new Intent(Intent.ACTION_VIEW, Uri.parse(
+                    "content://media/internal/images/media"));
+            startActivity(i);
         } else if (id == R.id.nav_share) {
-
+            Intent i = new Intent();
+            i.setAction(Intent.ACTION_SEND);
+            i.putExtra(Intent.EXTRA_TEXT, "This is my event to send.");
+            i.setType("text/plain");
+            startActivity(i);
         } else if (id == R.id.nav_contact) {
             Intent emailIntent = new Intent(Intent.ACTION_SENDTO);
             emailIntent.setData(Uri.parse("mailto: x13121651@student.ncirl.ie"));

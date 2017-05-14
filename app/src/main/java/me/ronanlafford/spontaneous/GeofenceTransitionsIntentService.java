@@ -20,10 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-/**
- * Created by 15the on 11/03/2017.
- */
-
 public class GeofenceTransitionsIntentService extends IntentService {
     protected static final String TAG = "geofence-trans-service";
 
@@ -33,8 +29,7 @@ public class GeofenceTransitionsIntentService extends IntentService {
     }
 
     @Override
-    public void onCreate()
-    {
+    public void onCreate() {
         super.onCreate();
     }
 
@@ -58,17 +53,14 @@ public class GeofenceTransitionsIntentService extends IntentService {
 
             // Get the geofences that were triggered. A single event can trigger multiple geofences.
             List<Geofence> triggeringGeofences = geofencingEvent.getTriggeringGeofences();
-           // Log.i("List triggered:", triggeringGeofences.toString());
+
             // Get the transition details as a String.
-            String geofenceTransitionDetails = getGeofenceTransitionDetails(
-                    this,
+            String geofenceTransitionDetails = getGeofenceTransitionDetails(this,
                     geofenceTransition,
                     triggeringGeofences
             );
 
-          //  Toast.makeText(this,"geodetails: xxxxxxxxxxxx" +geofenceTransitionDetails, Toast.LENGTH_LONG).show();
-
-            // Send notification and log the transition details.
+            // Send notification of the transition details.
             sendNotification(geofenceTransitionDetails);
             Log.i("important if sent", geofenceTransitionDetails);
         } else {
@@ -82,6 +74,7 @@ public class GeofenceTransitionsIntentService extends IntentService {
             int geofenceTransition,
             List<Geofence> triggeringGeofences) {
 
+        // get the transition type
         String geofenceTransitionString = getTransitionString(geofenceTransition);
 
         // Get the Ids of each geofence that was triggered.
@@ -109,13 +102,13 @@ public class GeofenceTransitionsIntentService extends IntentService {
     }
 
     private void sendNotification(String notificationDetails) {
-        // Create an explicit content Intent that starts the main Activity.
-        Intent notificationIntent = new Intent(getApplicationContext(), TabActivity.class);
+        // Create a notification intent that starts the TabActivity.
+        Intent notificationIntent = new Intent(getApplicationContext(), LoginActivity.class);
 
         // Construct a task stack.
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
 
-        // Add the main Activity to the task stack as the parent.
+        // Add the TabActivity to the task stack as the parent.
         stackBuilder.addParentStack(TabActivity.class);
 
         // Push the content Intent onto the stack.
@@ -129,10 +122,7 @@ public class GeofenceTransitionsIntentService extends IntentService {
 
         // Define the notification settings.
         builder.setSmallIcon(R.drawable.ic_location_on_deep_orange_500_24dp)
-                // In a real app, you may want to use a library like Volley
-                // to decode the Bitmap.
-                .setLargeIcon(BitmapFactory.decodeResource(getResources(),
-                        R.drawable.ic_location_on_deep_orange_500_24dp))
+                .setLargeIcon(BitmapFactory.decodeResource(getResources(), R.drawable.launcher))
                 .setColor(Color.RED)
                 .setContentTitle(notificationDetails)
                 .setContentText(getString(R.string.geofence_transition_notification_text))
